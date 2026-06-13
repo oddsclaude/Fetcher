@@ -134,6 +134,7 @@ def main():
         if not logo:
             logo = load_logo('linux', colors)
 
+    logo = logo.rstrip('\n')
     logo_lines = logo.splitlines()
     max_logo_width = max(visible_width(line) for line in logo_lines) if logo_lines else 0
     offset = max_logo_width + 4
@@ -276,7 +277,6 @@ def main():
     for line in info:
         print(line)
 
-    # Move cursor down only the remaining logo lines after the last info line
     remaining = len(logo_lines) - len(info)
     if remaining > 0:
         print(f"\033[{remaining}B", end="")
