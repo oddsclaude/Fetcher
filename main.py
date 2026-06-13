@@ -144,8 +144,9 @@ def main():
     username = subprocess.check_output("whoami", shell=True).decode().strip()
     hostname = subprocess.check_output("uname -n", shell=True).decode().strip()
 
-    print(f"\033[{offset}G{orange}{username}{white}@{green}{hostname}{reset}")
-    print(f"\033[{offset}G====================")
+    info = []
+    info.append(f"\033[{offset}G{orange}{username}{white}@{green}{hostname}{reset}")
+    info.append(f"\033[{offset}G====================")
 
     if platform.system() == "Darwin":
         try:
@@ -159,16 +160,16 @@ def main():
             os_name = subprocess.check_output("grep '^NAME' /etc/os-release", shell=True).decode().strip().split('=')[1].replace('"', '')
         except:
             os_name = "Linux"
-    print(f"\033[{offset}G {blue}OS:{reset} {os_name}")
+    info.append(f"\033[{offset}G {blue}OS:{reset} {os_name}")
 
     pkg_count = get_pkg_count()
-    print(f"\033[{offset}G {cyan}Packages:{reset} {pkg_count}")
+    info.append(f"\033[{offset}G {cyan}Packages:{reset} {pkg_count}")
 
     shell = os.path.basename(subprocess.check_output("echo $SHELL", shell=True).decode().strip())
-    print(f"\033[{offset}G {blue}Shell:{reset} {shell}")
+    info.append(f"\033[{offset}G {blue}Shell:{reset} {shell}")
 
     term = os.environ.get('TERM', 'unknown')
-    print(f"\033[{offset}G {purple}Terminal:{reset} {term}")
+    info.append(f"\033[{offset}G {purple}Terminal:{reset} {term}")
 
     if platform.system() == "Darwin":
         wm = "Aqua"
@@ -189,7 +190,7 @@ def main():
             os.environ.get('DISPLAY') and 'x11' or
             'TTY'
         )
-    print(f"\033[{offset}G {blue}WM:{reset} {wm}")
+    info.append(f"\033[{offset}G {blue}WM:{reset} {wm}")
 
     if platform.system() == "Darwin":
         cpu = "Apple Silicon"
@@ -206,7 +207,7 @@ def main():
             cpu = subprocess.check_output("lscpu | grep 'Model name'", shell=True).decode().strip().split('TM)')[1].strip()
         except:
             cpu = "Unknown"
-    print(f"\033[{offset}G {green}CPU:{reset} {cpu}")
+    info.append(f"\033[{offset}G {green}CPU:{reset} {cpu}")
 
     def get_ram():
         if platform.system() == "Darwin":
@@ -241,7 +242,7 @@ def main():
                 return "Unknown", "Unknown"
 
     total, used = get_ram()
-    print(f"\033[{offset}G {purple}RAM:{reset} {used} / {total}")
+    info.append(f"\033[{offset}G {purple}RAM:{reset} {used} / {total}")
 
     if platform.system() == "Darwin":
         try:
@@ -267,12 +268,19 @@ def main():
             uptime = subprocess.check_output("uptime -p", shell=True).decode().strip()
         except:
             uptime = "Unknown"
-    print(f"\033[{offset}G {blue}Uptime:{reset} {uptime}")
+    info.append(f"\033[{offset}G {blue}Uptime:{reset} {uptime}")
 
     age = get_sys_age()
-    print(f"\033[{offset}G {yellow}Age:{reset} {age}")
+    info.append(f"\033[{offset}G {yellow}Age:{reset} {age}")
 
-    print(f"\033[{len(logo_lines)}B", end="")
+    for line in info:
+        print(line)
+
+    # Move cursor down only the remaining logo lines after the last info line
+    remaining = len(logo_lines) - len(info)
+    if remaining > 0:
+        print(f"\033[{remaining}B", end="")
+    print()
 
 
 if __name__ == "__main__":
